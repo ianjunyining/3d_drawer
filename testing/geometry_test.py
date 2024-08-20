@@ -41,5 +41,20 @@ class TestGeo(ut.TestCase):
         ]
         self.compare_tuple_list(result, expected)
 
+    def test_reverse_projection(self):
+        f = 2.5
+        z = 3
+        T = np.array([
+            [0, -1, 0, 3],
+            [1, 0, 0, 3],
+            [0, 0, 1, z],
+            [0, 0, 0, 1],
+        ])
+        pts_3d = [(0, 0, 0, 1), (10, 10, 0, 1)]
+        pts_2d = geo.project(T, f, pts_3d)
+        T_inv = np.linalg.inv(T)
+        pts_3d_rev = geo.reverse_project(T_inv, f, z, pts_2d)
+        self.compare_tuple_list(pts_3d_rev, pts_3d)
+        
 if __name__ == "__main__":
     ut.main()

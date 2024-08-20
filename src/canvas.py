@@ -4,8 +4,12 @@ import src.transformation as trans
 
 class Canvas():
     def __init__(self) -> None:
-        self.transformation = trans.Transformation(f=1000, r=(math.pi / 4, math.pi / 4, math.pi / 4), t=((0, 0, 5000)))
+        self.transformation = trans.Transformation(f=1000, r=(math.pi / 4, math.pi / 4, math.pi / 4), t=(0, 0, 5000))
         self.shapes = []
+
+    def reset_3dview(self):
+        self.transformation.reset()
+        self.draw()
 
     def draw(self):
         for shape in self.shapes:

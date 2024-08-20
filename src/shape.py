@@ -90,16 +90,9 @@ class Line(Shape):
         self.points3D = [point3d1, point3d2]
         self.points2D = []
 
-    def project(self):
-        self.points2D = geo.project(
-            self.transformation.T, 
-            self.transformation.f, 
-            self.points3D,
-        )
-
     def draw(self):
         self.clear()
-        self.project()
+        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
         self._draw_line_segs(self.points2D)
         self.pen.penup()
         if self.selected:
@@ -140,24 +133,22 @@ class Cube(Shape):
     def __init__(self, pen: turtle.Turtle, transformation: trans.Transformation, s, center=[0, 0, 0]) -> None:
         super().__init__(pen, transformation)
         self.s = s
+        self.center = center
         self.points2D = []
-        self.points3D = [
-            [center[0], center[1], center[2], 1],
-            [s + center[0], center[1], center[2], 1],
-            [s + center[0], s + center[1], center[2], 1],
-            [center[0], s + center[1], center[2], 1],
-            [center[0], center[1], s + center[2], 1],
-            [s + center[0], center[1], s + center[2], 1],
-            [s + center[0], s + center[1], s + center[2], 1],
-            [center[0], s + center[1], s + center[2], 1],
-        ]
+        self.points3D = []
 
     def project(self):
-        self.points2D = geo.project(
-            self.transformation.T, 
-            self.transformation.f, 
-            self.points3D,
-        )
+        self.points3D = [
+            [self.center[0], self.center[1], self.center[2], 1],
+            [self.s + self.center[0], self.center[1], self.center[2], 1],
+            [self.s + self.center[0], self.s + self.center[1], self.center[2], 1],
+            [self.center[0], self.s + self.center[1], self.center[2], 1],
+            [self.center[0], self.center[1], self.s + self.center[2], 1],
+            [self.s + self.center[0], self.center[1], self.s + self.center[2], 1],
+            [self.s + self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
+            [self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
+        ]
+        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
 
     def draw(self):
         self.clear()

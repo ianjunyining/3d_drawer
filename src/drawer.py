@@ -7,6 +7,7 @@ class Action(enum.Enum):
     View = 1
     SELECT = 2
     LINE = 3
+    CUBE = 4
 
 
 class Color(enum.Enum):
@@ -40,6 +41,8 @@ class Drawer():
         self.action = Action.SELECT
         self.color = Color.BLUE
         self.state = State.END
+        self.temp_line = None
+        self.temp_cube = None
 
         # pen = turtle.Turtle()
         # pen.color(self.get_color_str(self.color))
@@ -71,8 +74,8 @@ class Drawer():
 
         pen = turtle.Turtle()
         pen.color(self.get_color_str(self.color))
-        self.temp_line = Cube(pen, self.canvas.transformation, 500)
-        self.canvas.shapes.append(self.temp_line)
+        self.temp_cube = Cube(pen, self.canvas.transformation, 500)
+        self.canvas.shapes.append(self.temp_cube)
         self.canvas.draw()
 
 
@@ -94,6 +97,7 @@ class Drawer():
             Action.SELECT: Button(turtle.Turtle(), (btn_st_x, btn_st_y), self.btn_sz, "Select"),
             Action.View: Button(turtle.Turtle(), (btn_st_x + btn_gap * 1, btn_st_y), self.btn_sz, "3D view"),
             Action.LINE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 2, btn_st_y), self.btn_sz, "Line"),
+            Action.CUBE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 3, btn_st_y), self.btn_sz, "Cube"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -153,32 +157,37 @@ class Drawer():
     def make_line(self, x, y):
         if self.action != Action.LINE:
             return
+        points3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
         if self.state == State.END:
             self.state = State.START
             pen = turtle.Turtle()
             pen.color(self.get_color_str(self.color))
-            self.temp_line = Line(pen, self.canvas.transformation, (x, y, 0, 1), (x, y, 0, 1))
+            self.temp_line = Line(pen, self.canvas.transformation, points3D[0], points3D[0])
             self.temp_line.draw()
         elif self.state == State.START:
             self.state = State.END
-            self.temp_line.point2 = (x, y, 0, 1)
+            self.temp_line.points3D[1] = points3D[0]
             self.temp_line.draw()
             self.canvas.shapes.append(self.temp_line)
 
-    def make_circle(self, x, y):
-        if self.action != Action.CIRCLE:
+    def make_cube(self, x, y):
+        if self.action != Action.CUBE:
             return
+        points3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
         if self.state == State.END:
             self.state = State.START
             pen = turtle.Turtle()
             pen.color(self.get_color_str(self.color))
-            self.temp_circle = Circle(pen, 0, (x, y))
-            self.temp_circle.draw()
+            self.temp_cube = Cube(pen, self.canvas.transformation, 0, points3D[0])
+            self.temp_cube.draw()
         elif self.state == State.START:
-            self.state = State.END
-            self.temp_circle.r = geo.distance(self.temp_circle.center, (x, y)) 
-            self.temp_circle.draw()
-            self.canvas.shapes.append(self.temp_circle)
+            self.state = State.END    
+            self.temp_cube.s = geo.distance(
+                    self.canvas.transformation.project_3d_to_2d([self.temp_cube.center])[0], 
+                    (x, y),
+            )
+            self.temp_cube.draw()
+            self.canvas.shapes.append(self.temp_cube)
 
     def make_polygon(self, x, y):
         if self.action != Action.POLYGON:
@@ -225,8 +234,8 @@ class Drawer():
             self.canvas.select_shapes((x, y), self.shift_pressed)
         elif self.action == Action.LINE:
             self.make_line(x, y)
-        if self.action != Action.SELECT:
-            self.canvas.deselect_all()
+        elif self.action == Action.CUBE:
+            self.make_cube(x, y)
         
 
     def onkeygroup(self):
