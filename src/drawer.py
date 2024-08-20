@@ -256,17 +256,16 @@ class Drawer():
             return
         delta = magnitude * 10
         key_translation = {
-            "j" : (self.canvas.transformation.inc_x, -delta),
-            "l" : (self.canvas.transformation.inc_x, delta),
-            "u" : (self.canvas.transformation.inc_y, -delta),
-            "o" : (self.canvas.transformation.inc_y, delta),
-            "i" : (self.canvas.transformation.inc_z, -delta),
-            "k" : (self.canvas.transformation.inc_z, delta),
+            "j" : (-delta, 0, 0),
+            "l" : (delta, 0, 0),
+            "u" : (0, delta, 0),
+            "o" : (0, -delta, 0),
+            "i" : (0, 0, -delta),
+            "k" : (0, 0, delta),
         }
         
         if key_pressed in key_translation.keys():
-            func, v = key_translation[key_pressed]
-            func(v)
+            self.canvas.transformation.translate(key_translation[key_pressed])
             self.canvas.draw()
 
     def onkey_3dview_rotate(self, key_pressed, magnitude=1):
@@ -275,16 +274,15 @@ class Drawer():
         delta = math.pi / 180 * magnitude
         
         key_rotate = {
-            "a" : (self.canvas.transformation.inc_yaw, -delta),
-            "d" : (self.canvas.transformation.inc_yaw, delta),
-            "q" : (self.canvas.transformation.inc_pitch, -delta),
-            "e" : (self.canvas.transformation.inc_pitch, delta),
-            "w" : (self.canvas.transformation.inc_roll, -delta),
-            "s" : (self.canvas.transformation.inc_roll, delta),      
+            "a" : (0, 0, -delta),
+            "d" : (0, 0, delta),
+            "q" : (0, -delta, 0),
+            "e" : (0, delta, 0),
+            "w" : (-delta, 0, 0),
+            "s" : (delta, 0, 0),      
         }
         if key_pressed in key_rotate.keys():
-            func, v = key_rotate[key_pressed]
-            func(v)
+            self.canvas.transformation.rotate(key_rotate[key_pressed])
             self.canvas.draw()
 
     def onkey_a(self):

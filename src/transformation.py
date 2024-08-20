@@ -24,23 +24,11 @@ class Transformation():
         self.t = t
         self.T = self.compute_transformation()        
 
-    def inc_yaw(self, delta):
-        self.set_r([self.r[0], self.r[1], self.r[2] + delta])
+    def rotate(self, delta):
+        self.set_r(geo.add_vec(self.r, delta))
     
-    def inc_pitch(self, delta):
-        self.set_r([self.r[0], self.r[1] + delta, self.r[2]])
-    
-    def inc_roll(self, delta):
-        self.set_r([self.r[0] + delta, self.r[1], self.r[2]])
-
-    def inc_x(self, delta):
-        self.set_t([self.t[0] + delta, self.t[1], self.t[2]])
-
-    def inc_y(self, delta):
-        self.set_t([self.t[0], self.t[1] + delta, self.t[2]])
-
-    def inc_z(self, delta):
-        self.set_t([self.t[0], self.t[1], self.t[2] + delta] )
+    def translate(self, delta):
+        self.set_t(geo.add_vec(self.t, delta))
     
     def compute_transformation(self):
         cr, cp, cy = np.cos(self.r)

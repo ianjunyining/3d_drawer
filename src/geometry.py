@@ -34,3 +34,5 @@ def distance_3d(pt1, pt2):
     x2, y2, z2 = pt2[0:3]
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
+def add_vec(v1, v2):
+    return [i1 + i2 for i1, i2 in zip(v1, v2)]
