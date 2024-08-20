@@ -189,9 +189,9 @@ class Drawer():
             self.temp_cube.draw()
         elif self.state == State.START:
             self.state = State.END    
-            self.temp_cube.s = geo.distance(
-                    self.canvas.transformation.project_3d_to_2d([self.temp_cube.center])[0], 
-                    (x, y),
+            self.temp_cube.s = geo.distance_3d(
+                self.temp_cube.center, 
+                points3D[0],
             )
             self.temp_cube.draw()
             self.canvas.shapes.append(self.temp_cube)

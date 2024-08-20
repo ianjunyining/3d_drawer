@@ -208,19 +208,6 @@ class WorldCoord(Shape):
         self.points2D = []
         self.points3D = [(0, 0, 0, 1), (s, 0, 0, 1), (0, s, 0, 1), (0, 0, s, 1)]
 
-    def project(self):
-        self.points3D = [
-            [self.center[0], self.center[1], self.center[2], 1],
-            [self.s + self.center[0], self.center[1], self.center[2], 1],
-            [self.s + self.center[0], self.s + self.center[1], self.center[2], 1],
-            [self.center[0], self.s + self.center[1], self.center[2], 1],
-            [self.center[0], self.center[1], self.s + self.center[2], 1],
-            [self.s + self.center[0], self.center[1], self.s + self.center[2], 1],
-            [self.s + self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
-            [self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
-        ]
-        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
-
     def draw(self):
         self.clear()
         self.points2D = self.transformation.project_3d_to_2d(self.points3D)

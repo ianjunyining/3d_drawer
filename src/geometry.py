@@ -30,7 +30,7 @@ def reverse_project(T_inv, f : float, z: float, pts_2d : list):
     return pts_3d
 
 def distance_3d(pt1, pt2):
-    x1, y1, z1 = pt1
-    x2, y2, z2 = pt2
-    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (y2 - y1) ** 3)
+    x1, y1, z1 = pt1[0:3]
+    x2, y2, z2 = pt2[0:3]
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
