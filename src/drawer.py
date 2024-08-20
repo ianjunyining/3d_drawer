@@ -74,8 +74,15 @@ class Drawer():
 
         pen = turtle.Turtle()
         pen.color(self.get_color_str(self.color))
-        self.temp_cube = Cube(pen, self.canvas.transformation, 500)
+        self.temp_cube = Cube(pen, self.canvas.transformation, 500, [200, 200, 200])
         self.canvas.shapes.append(self.temp_cube)
+        self.canvas.draw()
+
+        pen = turtle.Turtle()
+        pen.color(self.get_color_str(self.color))
+        self.temp_world_coord = WorldCoord(pen, self.canvas.transformation, 300)
+        self.canvas.shapes.append(self.temp_world_coord)
+
         self.canvas.draw()
 
 

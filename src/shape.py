@@ -28,21 +28,31 @@ class Shape():
     def draw(self):
         pass
 
-    def _draw_ploygon(self, points):
+    def _draw_ploygon(self, points, color=None):
+        if color:
+            old_color, _ = self.pen.color()
+            self.pen.color(color)
         self.pen.penup()
         self.pen.goto(points[-1])
         self.pen.pendown()
         for pt in points:
             self.pen.goto(pt)
         self.pen.penup()
+        if color:
+            self.pen.color(old_color)
 
-    def _draw_line_segs(self, points):
+    def _draw_line_segs(self, points, color=None):
+        if color:
+            old_color, _ = self.pen.color()
+            self.pen.color(color)
         self.pen.penup()
         self.pen.goto(points[0])
         self.pen.pendown()
         for pt in points[1:]:
             self.pen.goto(pt)
         self.pen.penup()
+        if color:
+            self.pen.color(old_color)
 
     def get_selection_points(self):
         raise NotImplemented(f"{self._type()}: get_selection_points() is not implemented")
@@ -189,3 +199,31 @@ class Cube(Shape):
     
     def clone(self):
         return Line(self.clone_pen(), geo.translate(self.point1, self.copy_delta), geo.translate(self.point2, self.copy_delta))
+    
+
+class WorldCoord(Shape):
+    def __init__(self, pen: turtle.Turtle, transformation: trans.Transformation, s) -> None:
+        super().__init__(pen, transformation)
+        self.s = s
+        self.points2D = []
+        self.points3D = [(0, 0, 0, 1), (s, 0, 0, 1), (0, s, 0, 1), (0, 0, s, 1)]
+
+    def project(self):
+        self.points3D = [
+            [self.center[0], self.center[1], self.center[2], 1],
+            [self.s + self.center[0], self.center[1], self.center[2], 1],
+            [self.s + self.center[0], self.s + self.center[1], self.center[2], 1],
+            [self.center[0], self.s + self.center[1], self.center[2], 1],
+            [self.center[0], self.center[1], self.s + self.center[2], 1],
+            [self.s + self.center[0], self.center[1], self.s + self.center[2], 1],
+            [self.s + self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
+            [self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
+        ]
+        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
+
+    def draw(self):
+        self.clear()
+        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
+        self._draw_line_segs([self.points2D[0], self.points2D[1]], 'red')
+        self._draw_line_segs([self.points2D[0], self.points2D[2]], 'green')
+        self._draw_line_segs([self.points2D[0], self.points2D[3]], 'blue')
