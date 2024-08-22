@@ -251,9 +251,7 @@ class Drawer():
     def onkeycopy(self):
         self.canvas.copy_selected()
         
-    def onkey_3dview_translate(self, key_pressed, magnitude=1):
-        if self.action != Action.View:
-            return
+    def onkey_translate(self, key_pressed, magnitude=1):
         delta = magnitude * 10
         key_translation = {
             "j" : (-delta, 0, 0),
@@ -265,8 +263,11 @@ class Drawer():
         }
         
         if key_pressed in key_translation.keys():
-            self.canvas.transformation.translate(key_translation[key_pressed])
-            self.canvas.draw()
+            if self.action == Action.View:
+                self.canvas.transformation.translate(key_translation[key_pressed])
+                self.canvas.draw()
+            elif self.action == Action.SELECT:
+                self.canvas.translate_selected(key_translation[key_pressed])
 
     def onkey_3dview_rotate(self, key_pressed, magnitude=1):
         if self.action != Action.View:
@@ -323,38 +324,38 @@ class Drawer():
 
     # ------------------ translation ------------------
     def onkey_j(self):
-        self.onkey_3dview_translate("j")
+        self.onkey_translate("j")
 
     def onkey_l(self):
-        self.onkey_3dview_translate("l")
+        self.onkey_translate("l")
 
     def onkey_u(self):
-        self.onkey_3dview_translate("u")
+        self.onkey_translate("u")
 
     def onkey_o(self):
-        self.onkey_3dview_translate("o")
+        self.onkey_translate("o")
     
     def onkey_i(self):
-        self.onkey_3dview_translate("i")
+        self.onkey_translate("i")
 
     def onkey_k(self):
-        self.onkey_3dview_translate("k")
+        self.onkey_translate("k")
 
     def onkey_J(self):
-        self.onkey_3dview_translate("j", 10)
+        self.onkey_translate("j", 10)
 
     def onkey_L(self):
-        self.onkey_3dview_translate("l", 10)
+        self.onkey_translate("l", 10)
 
     def onkey_U(self):
-        self.onkey_3dview_translate("u", 10)
+        self.onkey_translate("u", 10)
 
     def onkey_O(self):
-        self.onkey_3dview_translate("o", 10)
+        self.onkey_translate("o", 10)
     
     def onkey_I(self):
-        self.onkey_3dview_translate("i", 10)
+        self.onkey_translate("i", 10)
 
     def onkey_K(self):
-        self.onkey_3dview_translate("k", 10)
+        self.onkey_translate("k", 10)
 

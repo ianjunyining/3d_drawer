@@ -36,3 +36,27 @@ def distance_3d(pt1, pt2):
 
 def add_vec(v1, v2):
     return [i1 + i2 for i1, i2 in zip(v1, v2)]
+
+def points_boundary(points):
+    X = [point[0] for point in points]
+    Y = [point[1] for point in points]
+    return min(X), max(X), min(Y), max(Y)
+
+def point_in_boundary(min_x, max_x, min_y, max_y , point):
+    return point[0] >= min_x and point[0] <= max_x \
+        and point[1] >= min_y and point[1] <= max_y
+
+def translate_point_3D(point : tuple, delta : tuple):
+    return (point[0] + delta[0], point[1] + delta[1], point[2] + delta[2], 1)
+
+def  translate_points_3D(points : list, delta : tuple):
+    return [translate_point_3D(pt, delta) for pt in points]
+
+def avg_points3D(points):
+    sum0, sum1, sum2 = 0, 0
+    for point in points:
+        sum0 += point[0]
+        sum1 += point[1]
+        sum2 += point[2]
+    n = len(points)
+    return (sum0 / n, sum1 / n, sum2 / n, 1)

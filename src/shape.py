@@ -145,9 +145,6 @@ class Cube(Shape):
         self.s = s
         self.center = center
         self.points2D = []
-        self.points3D = []
-
-    def project(self):
         self.points3D = [
             [self.center[0], self.center[1], self.center[2], 1],
             [self.s + self.center[0], self.center[1], self.center[2], 1],
@@ -158,6 +155,8 @@ class Cube(Shape):
             [self.s + self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
             [self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
         ]
+
+    def project(self):
         self.points2D = self.transformation.project_3d_to_2d(self.points3D)
 
     def draw(self):
@@ -171,14 +170,14 @@ class Cube(Shape):
             self.draw_selection_points()
 
     def get_selection_points(self):
-        return [self.point2d1, self.point2d2]
+        return  self.points2D
     
     def point_in_shape(self, point):
-        return geo.distance_point_to_segment(self.point1, self.point2, point) <= 5
+        min_x, max_x, min_y, max_y = geo.points_boundary(self.points2D)
+        return geo.point_in_boundary(min_x, max_x, min_y, max_y, point)
     
     def translate(self, delta):
-        self.point1 = geo.translate(self.point1, delta)
-        self.point2 = geo.translate(self.point2, delta)
+        self.points3D = geo.translate_points_3D(self.points3D, delta)
 
     def rotate(self, theta, center=None):
         rotate_center = center if center else self.get_center()
@@ -214,3 +213,6 @@ class WorldCoord(Shape):
         self._draw_line_segs([self.points2D[0], self.points2D[1]], 'red')
         self._draw_line_segs([self.points2D[0], self.points2D[2]], 'green')
         self._draw_line_segs([self.points2D[0], self.points2D[3]], 'blue')
+
+    def point_in_shape(self, point):
+        return False
