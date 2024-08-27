@@ -44,45 +44,10 @@ class Drawer():
         self.temp_line = None
         self.temp_cube = None
 
-        # pen = turtle.Turtle()
-        # pen.color(self.get_color_str(self.color))
-        # self.temp_line = Line(pen, self.canvas.transformation, (0, 0, 0, 1), (100, 100, 10, 1))
-        # self.temp_line.draw()
-        # self.canvas.shapes.append(self.temp_line)
-
-        # pen = turtle.Turtle()
-        # pen.color(self.get_color_str(self.color))
-        # self.temp_line = Line(pen, self.canvas.transformation, (0, 0, 0, 1), (-100, 100, 10, 1))
-        # self.temp_line.draw()
-        # self.canvas.shapes.append(self.temp_line)
-        # c = [
-        #     (0, 0, 0),
-        #     (0, 0, 500),
-        #     (0, 500, 0),
-        #     (0, 500, 500),
-        #     (500, 0, 0),
-        #     (500, 0, 500),
-        #     (500, 500, 0),
-        #     (500, 500, 500),
-        # ]
-        # for i in range(8):
-        #     pen = turtle.Turtle()
-        #     pen.color(self.get_color_str(self.color))
-        #     self.temp_line = Cube(pen, self.canvas.transformation, 500, c[i])
-        #     self.canvas.shapes.append(self.temp_line)
-        #     self.canvas.draw()
-
-        pen = turtle.Turtle()
-        pen.color(self.get_color_str(self.color))
-        self.temp_cube = Cube(pen, self.canvas.transformation, 500, [200, 200, 200])
-        self.canvas.shapes.append(self.temp_cube)
-        self.canvas.draw()
-
         pen = turtle.Turtle()
         pen.color(self.get_color_str(self.color))
         self.temp_world_coord = WorldCoord(pen, self.canvas.transformation, 300)
         self.canvas.shapes.append(self.temp_world_coord)
-
         self.canvas.draw()
 
 
@@ -180,18 +145,23 @@ class Drawer():
     def make_cube(self, x, y):
         if self.action != Action.CUBE:
             return
-        points3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
         if self.state == State.END:
             self.state = State.START
+            self.temp_points_3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
+        elif self.state == State.START:
+            self.state = State.END 
+            self.temp_points_3D.extend(self.canvas.transformation.project_2d_to_3d([(x, y)]))
+            s = geo.distance_3d(
+                self.temp_points_3D[0], 
+                self.temp_points_3D[1],
+            )
             pen = turtle.Turtle()
             pen.color(self.get_color_str(self.color))
-            self.temp_cube = Cube(pen, self.canvas.transformation, 0, points3D[0])
-            self.temp_cube.draw()
-        elif self.state == State.START:
-            self.state = State.END    
-            self.temp_cube.s = geo.distance_3d(
-                self.temp_cube.center, 
-                points3D[0],
+            self.temp_cube = Cube(
+                pen, 
+                self.canvas.transformation, 
+                s, 
+                geo.avg_points3D(self.temp_points_3D),
             )
             self.temp_cube.draw()
             self.canvas.shapes.append(self.temp_cube)
@@ -250,6 +220,9 @@ class Drawer():
 
     def onkeycopy(self):
         self.canvas.copy_selected()
+
+    def onkeydelete(self):
+        self.canvas.delete_selected()
         
     def onkey_translate(self, key_pressed, magnitude=1):
         delta = magnitude * 10
@@ -269,9 +242,7 @@ class Drawer():
             elif self.action == Action.SELECT:
                 self.canvas.translate_selected(key_translation[key_pressed])
 
-    def onkey_3dview_rotate(self, key_pressed, magnitude=1):
-        if self.action != Action.View:
-            return
+    def onkey_rotate(self, key_pressed, magnitude=1):
         delta = math.pi / 180 * magnitude
         
         key_rotate = {
@@ -283,44 +254,47 @@ class Drawer():
             "s" : (delta, 0, 0),      
         }
         if key_pressed in key_rotate.keys():
-            self.canvas.transformation.rotate(key_rotate[key_pressed])
-            self.canvas.draw()
+            if self.action == Action.View:
+                self.canvas.transformation.translate(key_rotate[key_pressed])
+                self.canvas.draw()
+            elif self.action == Action.SELECT:
+                self.canvas.rotate_selected(key_rotate[key_pressed])
 
     def onkey_a(self):
-        self.onkey_3dview_rotate("a")
+        self.onkey_rotate("a")
 
     def onkey_d(self):
-        self.onkey_3dview_rotate("d")
+        self.onkey_rotate("d")
 
     def onkey_q(self):
-        self.onkey_3dview_rotate("q")
+        self.onkey_rotate("q")
 
     def onkey_e(self):
-        self.onkey_3dview_rotate("e")
+        self.onkey_rotate("e")
     
     def onkey_w(self):
-        self.onkey_3dview_rotate("w")
+        self.onkey_rotate("w")
 
     def onkey_s(self):
-        self.onkey_3dview_rotate("s")
+        self.onkey_rotate("s")
 
     def onkey_A(self):
-        self.onkey_3dview_rotate("a", 10)
+        self.onkey_rotate("a", 10)
 
     def onkey_D(self):
-        self.onkey_3dview_rotate("d", 10)
+        self.onkey_rotate("d", 10)
 
     def onkey_Q(self):
-        self.onkey_3dview_rotate("q", 10)
+        self.onkey_rotate("q", 10)
 
     def onkey_E(self):
-        self.onkey_3dview_rotate("e", 10)
+        self.onkey_rotate("e", 10)
     
     def onkey_W(self):
-        self.onkey_3dview_rotate("w", 10)
+        self.onkey_rotate("w", 10)
 
     def onkey_S(self):
-        self.onkey_3dview_rotate("s", 10)
+        self.onkey_rotate("s", 10)
 
     # ------------------ translation ------------------
     def onkey_j(self):

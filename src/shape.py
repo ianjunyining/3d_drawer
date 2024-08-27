@@ -12,7 +12,7 @@ class Shape():
         self.pen = pen
         self.sr = 5
         self.transformation = transformation
-        self.copy_delta = (10, 0, 0)
+        self.copy_delta = (50, 50, 50)
         if pen:
             self.pen.hideturtle()
 
@@ -109,26 +109,19 @@ class Line(Shape):
             self.draw_selection_points()
 
     def get_selection_points(self):
-        return [self.point2d1, self.point2d2]
+        return self.points2D
     
     def point_in_shape(self, point):
-        return geo.distance_point_to_segment(self.point1, self.point2, point) <= 5
+        return geo.distance_point_to_segment(self.points2D[0], self.points2D[1], point) <= 5
     
     def translate(self, delta):
-        self.point1 = geo.translate(self.point1, delta)
-        self.point2 = geo.translate(self.point2, delta)
+        self.points3D = geo.translate_points_3D(self.points3D, delta)
 
-    def rotate(self, theta, center=None):
-        rotate_center = center if center else self.get_center()
-        self.point1 = geo.rotate(self.point1, theta, rotate_center)
-        self.point2 = geo.rotate(self.point2, theta, rotate_center)
+    def rotate(self, delta, center):
+        self.points3D = geo.rotate_3D(self.points3D, delta, center)
 
     def get_center(self):
-        center = (
-            (self.point1[0] + self.point2[0]) / 2,
-            (self.point1[1] + self.point2[1]) / 2,
-        )
-        return center
+        return geo.avg_points3D(self.points3D)
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
@@ -142,19 +135,18 @@ class Line(Shape):
 class Cube(Shape):
     def __init__(self, pen: turtle.Turtle, transformation: trans.Transformation, s, center=[0, 0, 0]) -> None:
         super().__init__(pen, transformation)
-        self.s = s
-        self.center = center
         self.points2D = []
         self.points3D = [
-            [self.center[0], self.center[1], self.center[2], 1],
-            [self.s + self.center[0], self.center[1], self.center[2], 1],
-            [self.s + self.center[0], self.s + self.center[1], self.center[2], 1],
-            [self.center[0], self.s + self.center[1], self.center[2], 1],
-            [self.center[0], self.center[1], self.s + self.center[2], 1],
-            [self.s + self.center[0], self.center[1], self.s + self.center[2], 1],
-            [self.s + self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
-            [self.center[0], self.s + self.center[1], self.s + self.center[2], 1],
+            [0, 0, 0, 1],
+            [s, 0, 0, 1],
+            [s, s, 0, 1],
+            [0, s, 0, 1],
+            [0, 0, s, 1],
+            [s, 0, s, 1],
+            [s, s, s, 1],
+            [0, s, s, 1],
         ]
+        self.translate(geo.add_vec(center, (-s/2, -s/2, -s/2)))
 
     def project(self):
         self.points2D = self.transformation.project_3d_to_2d(self.points3D)
@@ -179,17 +171,11 @@ class Cube(Shape):
     def translate(self, delta):
         self.points3D = geo.translate_points_3D(self.points3D, delta)
 
-    def rotate(self, theta, center=None):
-        rotate_center = center if center else self.get_center()
-        self.point1 = geo.rotate(self.point1, theta, rotate_center)
-        self.point2 = geo.rotate(self.point2, theta, rotate_center)
+    def rotate(self, delta, center=None):
+        self.points3D = geo.rotate_3D(self.points3D, delta, center)
 
     def get_center(self):
-        center = (
-            (self.point1[0] + self.point2[0]) / 2,
-            (self.point1[1] + self.point2[1]) / 2,
-        )
-        return center
+        return geo.avg_points3D(self.points3D)
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
@@ -197,7 +183,9 @@ class Cube(Shape):
         self.point2 = geo.scale(s, s_center, self.point2)
     
     def clone(self):
-        return Line(self.clone_pen(), geo.translate(self.point1, self.copy_delta), geo.translate(self.point2, self.copy_delta))
+        cube = Cube(self.clone_pen(), self.transformation, 0)
+        cube.points3D = geo.translate_points_3D(self.points3D, self.copy_delta)
+        return cube
     
 
 class WorldCoord(Shape):

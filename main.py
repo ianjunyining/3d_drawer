@@ -112,6 +112,8 @@ screen.onkeypress(drawer.onkey_U, "U")
 screen.onkeypress(drawer.onkey_O, "O")
 screen.onkeypress(drawer.onkey_I, "I")
 screen.onkeypress(drawer.onkey_K, "K")
+screen.onkeypress(drawer.onkeycopy, "c")
+screen.onkeypress(drawer.onkeydelete, "BackSpace")
 
 screen.listen()
 screen.mainloop()

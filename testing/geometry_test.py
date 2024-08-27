@@ -4,6 +4,7 @@ print(sys.path)
 
 import unittest as ut
 import numpy as np
+import math
 import src.geometry as geo
 
 class TestGeo(ut.TestCase):
@@ -55,6 +56,10 @@ class TestGeo(ut.TestCase):
         T_inv = np.linalg.inv(T)
         pts_3d_rev = geo.reverse_project(T_inv, f, z, pts_2d)
         self.compare_tuple_list(pts_3d_rev, pts_3d)
-        
+
+    def test_rotate_3D(self):
+        result = geo.rotate_3D([[2, 0, 0, 1], [2, 2, 0, 1]], [0, 0, math.pi/2], [1, 1, 0])
+        np.testing.assert_array_almost_equal(result, [[2, 2, 0, 1], [0, 2, 0, 1]])
+
 if __name__ == "__main__":
     ut.main()

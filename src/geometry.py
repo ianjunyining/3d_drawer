@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import src.transformation as trans
 
 def project(T, f : float, pts_3d : list) -> list:
     # print("pts_3d: ", pts_3d)
@@ -49,14 +50,53 @@ def point_in_boundary(min_x, max_x, min_y, max_y , point):
 def translate_point_3D(point : tuple, delta : tuple):
     return (point[0] + delta[0], point[1] + delta[1], point[2] + delta[2], 1)
 
-def  translate_points_3D(points : list, delta : tuple):
+def translate_points_3D(points : list, delta : tuple):
     return [translate_point_3D(pt, delta) for pt in points]
 
 def avg_points3D(points):
-    sum0, sum1, sum2 = 0, 0
+    sum0, sum1, sum2 = 0, 0, 0
     for point in points:
         sum0 += point[0]
         sum1 += point[1]
         sum2 += point[2]
     n = len(points)
     return (sum0 / n, sum1 / n, sum2 / n, 1)
+
+def distance_point_to_segment(pt1, pt2, pt):
+    # Convert points to numpy arrays
+    pt1 = np.array(pt1)
+    pt2 = np.array(pt2)
+    pt = np.array(pt)
+    
+    # Vector from pt1 to pt2
+    d = pt2 - pt1
+    # Vector from pt1 to pt
+    v = pt - pt1
+    
+    # Dot products
+    d_dot_d = np.dot(d, d)
+    v_dot_d = np.dot(v, d)
+    
+    # Parameter t of the projection
+    t = v_dot_d / d_dot_d
+    
+    # Clamping t to the segment
+    if t < 0.0:
+        closest_point = pt1
+    elif t > 1.0:
+        closest_point = pt2
+    else:
+        closest_point = pt1 + t * d
+    
+    # Distance from pt to the closest point
+    distance = np.linalg.norm(pt - closest_point)
+    
+    return distance
+
+def rotate_3D(points, delta, center):
+    X0b = translate_points_3D(points, (-center[0], -center[1], -center[2]))
+    transformation = trans.Transformation(0, delta)
+    X0b_arr = np.array(X0b).T
+    X1b_arr = np.dot(transformation.T, X0b_arr)
+    X1b = [X1b_arr[:, i] for i in range(len(points))]
+    return translate_points_3D(X1b, center)
