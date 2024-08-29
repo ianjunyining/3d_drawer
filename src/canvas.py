@@ -1,6 +1,7 @@
 import turtle
 from src.shape import *
 import src.transformation as trans
+from arts.walls import *
 
 class Canvas():
     def __init__(self) -> None:
@@ -104,13 +105,13 @@ class Canvas():
         # self.delete_all()
 
         arts_map = {
-            "fractal_triangle": FractalTriangle,
+            "walls": Walls,
             "cube": Cube,
         }
 
         if name in arts_map:
             art_class = arts_map[name]
-            self.shapes.append(art_class().create_combined_shape())
+            self.shapes.extend(art_class(self.transformation).create_shapes())
         else:
             raise f"Undefined customized art: {name}"
         

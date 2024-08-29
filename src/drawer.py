@@ -8,6 +8,7 @@ class Action(enum.Enum):
     SELECT = 2
     LINE = 3
     CUBE = 4
+    WALLS = 5
 
 
 class Color(enum.Enum):
@@ -70,6 +71,7 @@ class Drawer():
             Action.View: Button(turtle.Turtle(), (btn_st_x + btn_gap * 1, btn_st_y), self.btn_sz, "3D view"),
             Action.LINE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 2, btn_st_y), self.btn_sz, "Line"),
             Action.CUBE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 3, btn_st_y), self.btn_sz, "Cube"),
+            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 4, btn_st_y), self.btn_sz, "Walls"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -203,7 +205,8 @@ class Drawer():
 
     def onclick(self, x, y):
         if self.click_on_action_button(x, y):
-            pass
+            if self.action == Action.WALLS:
+                self.canvas.create_customized_arts("walls")
         elif self.click_on_color_button(x, y):
             # don't draw
             pass
@@ -255,7 +258,7 @@ class Drawer():
         }
         if key_pressed in key_rotate.keys():
             if self.action == Action.View:
-                self.canvas.transformation.translate(key_rotate[key_pressed])
+                self.canvas.transformation.rotate(key_rotate[key_pressed])
                 self.canvas.draw()
             elif self.action == Action.SELECT:
                 self.canvas.rotate_selected(key_rotate[key_pressed])
