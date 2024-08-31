@@ -9,6 +9,7 @@ class Action(enum.Enum):
     LINE = 3
     CUBE = 4
     WALLS = 5
+    PYRAMID = 6
 
 
 class Color(enum.Enum):
@@ -71,7 +72,8 @@ class Drawer():
             Action.View: Button(turtle.Turtle(), (btn_st_x + btn_gap * 1, btn_st_y), self.btn_sz, "3D view"),
             Action.LINE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 2, btn_st_y), self.btn_sz, "Line"),
             Action.CUBE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 3, btn_st_y), self.btn_sz, "Cube"),
-            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 4, btn_st_y), self.btn_sz, "Walls"),
+            Action.PYRAMID: Button(turtle.Turtle(), (btn_st_x + btn_gap * 4, btn_st_y), self.btn_sz, "Pyramid"),
+            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 5, btn_st_y), self.btn_sz, "Walls"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -168,6 +170,30 @@ class Drawer():
             self.temp_cube.draw()
             self.canvas.shapes.append(self.temp_cube)
 
+    def make_pyramid(self, x, y):
+        if self.action != Action.PYRAMID:
+            return
+        if self.state == State.END:
+            self.state = State.START
+            self.temp_points_3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
+        elif self.state == State.START:
+            self.state = State.END 
+            self.temp_points_3D.extend(self.canvas.transformation.project_2d_to_3d([(x, y)]))
+            s = geo.distance_3d(
+                self.temp_points_3D[0], 
+                self.temp_points_3D[1],
+            )
+            pen = turtle.Turtle()
+            pen.color(self.get_color_str(self.color))
+            self.temp_cube = Pyramid(
+                pen, 
+                self.canvas.transformation, 
+                s, 
+                geo.avg_points3D(self.temp_points_3D),
+            )
+            self.temp_cube.draw()
+            self.canvas.shapes.append(self.temp_cube)
+
     def make_polygon(self, x, y):
         if self.action != Action.POLYGON:
             return
@@ -216,6 +242,8 @@ class Drawer():
             self.make_line(x, y)
         elif self.action == Action.CUBE:
             self.make_cube(x, y)
+        elif self.action == Action.PYRAMID:
+            self.make_pyramid(x, y)
         
 
     def onkeygroup(self):

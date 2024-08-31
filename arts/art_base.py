@@ -9,5 +9,5 @@ class ArtBase:
         pass
 
     def create_combined_shape(self):
-        return CombinedShape(None, self.create_shapes())
+        return CombinedShape(None, self.transformation, self.create_shapes())
     

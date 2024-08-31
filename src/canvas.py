@@ -85,7 +85,7 @@ class Canvas():
                 selected_shapes.append(shape)
             else:
                 self.shapes.append(shape)
-        combined_shape = CombinedShape(turtle.Turtle(), selected_shapes)
+        combined_shape = CombinedShape(turtle.Turtle(), self.transformation, selected_shapes)
         combined_shape.set_selected(True)
         self.shapes.append(combined_shape)
 
@@ -111,7 +111,7 @@ class Canvas():
 
         if name in arts_map:
             art_class = arts_map[name]
-            self.shapes.extend(art_class(self.transformation).create_shapes())
+            self.shapes.append(art_class(self.transformation).create_combined_shape())
         else:
             raise f"Undefined customized art: {name}"
         
