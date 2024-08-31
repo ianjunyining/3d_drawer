@@ -8,8 +8,9 @@ class Action(enum.Enum):
     SELECT = 2
     LINE = 3
     CUBE = 4
-    WALLS = 5
-    PYRAMID = 6
+    PYRAMID = 5
+    CIRCLE = 6
+    WALLS = 7
 
 
 class Color(enum.Enum):
@@ -73,7 +74,8 @@ class Drawer():
             Action.LINE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 2, btn_st_y), self.btn_sz, "Line"),
             Action.CUBE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 3, btn_st_y), self.btn_sz, "Cube"),
             Action.PYRAMID: Button(turtle.Turtle(), (btn_st_x + btn_gap * 4, btn_st_y), self.btn_sz, "Pyramid"),
-            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 5, btn_st_y), self.btn_sz, "Walls"),
+            Action.CIRCLE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 5, btn_st_y), self.btn_sz, "Circle"),
+            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 6, btn_st_y), self.btn_sz, "Walls"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -194,40 +196,29 @@ class Drawer():
             self.temp_cube.draw()
             self.canvas.shapes.append(self.temp_cube)
 
-    def make_polygon(self, x, y):
-        if self.action != Action.POLYGON:
+    def make_circle(self, x, y):
+        if self.action != Action.CIRCLE:
             return
         if self.state == State.END:
             self.state = State.START
+            self.temp_points_3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
+        elif self.state == State.START:
+            self.state = State.END 
+            self.temp_points_3D.extend(self.canvas.transformation.project_2d_to_3d([(x, y)]))
+            r = geo.distance_3d(
+                self.temp_points_3D[0], 
+                self.temp_points_3D[1],
+            )
             pen = turtle.Turtle()
             pen.color(self.get_color_str(self.color))
-            self.temp_polygon = Polygon(pen, [(x, y)])
-            self.temp_polygon.draw()
-        elif self.state == State.START:
-            self.temp_polygon.points.append((x, y))
-            self.temp_polygon.draw()
-            if self.shift_pressed:
-                self.state = State.END
-                self.canvas.shapes.append(self.temp_polygon)
-
-
-    def make_regular_polygon(self, x, y):
-        if self.action != Action.RPOLYGON:
-            return
-        if self.state == State.END:
-            self.state = State.START
-            pen = turtle.Turtle()
-            pen.color(self.get_color_str(self.color))
-            self.temp_rpolygon = RegularPolygon(pen, (x, y), 0, 0)
-        elif self.state == State.START:
-            self.state = State.END
-            sides = self.screen.textinput("Enter sides", "How many sides?")
-            self.screen.listen()
-            if sides:
-                self.temp_rpolygon.r = geo.distance(self.temp_rpolygon.center, (x, y)) 
-                self.temp_rpolygon.num_sides = int(sides)
-                self.temp_rpolygon.draw()
-                self.canvas.shapes.append(self.temp_rpolygon)
+            self.temp_circle = Circle(
+                pen, 
+                self.canvas.transformation, 
+                r, 
+                geo.avg_points3D(self.temp_points_3D),
+            )
+            self.temp_circle.draw()
+            self.canvas.shapes.append(self.temp_circle)
 
     def onclick(self, x, y):
         if self.click_on_action_button(x, y):
@@ -244,6 +235,8 @@ class Drawer():
             self.make_cube(x, y)
         elif self.action == Action.PYRAMID:
             self.make_pyramid(x, y)
+        elif self.action == Action.CIRCLE:
+            self.make_circle(x, y)
         
 
     def onkeygroup(self):

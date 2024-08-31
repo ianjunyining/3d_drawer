@@ -12,7 +12,7 @@ class Shape():
         self.pen = pen
         self.sr = 5
         self.transformation = transformation
-        self.copy_delta = (50, 50, 50)
+        self.copy_delta = (100, 100, 100)
         if pen:
             self.pen.hideturtle()
 
@@ -238,6 +238,52 @@ class Pyramid(Shape):
         pyramid.points3D = geo.translate_points_3D(self.points3D, self.copy_delta)
         return pyramid
 
+
+class Circle(Shape):
+    def __init__(self, pen: turtle.Turtle, transformation: trans.Transformation, r, center=[0, 0, 0]) -> None:
+        super().__init__(pen, transformation)
+        n = 72
+        theta = 2 * math.pi / n
+        self.points3D = []
+        for i in range(n):
+            self.points3D.append([r * math.cos(i * theta), r * math.sin(i * theta), 0, 1])
+        self.translate(center)
+
+    def project(self):
+        self.points2D = self.transformation.project_3d_to_2d(self.points3D)
+
+    def draw(self):
+        self.clear()
+        self.project()
+        self._draw_ploygon(self.points2D)
+        if self.selected:
+            self.draw_selection_points()
+
+    def get_selection_points(self):
+        return  self.points2D
+    
+    def point_in_shape(self, point):
+        min_x, max_x, min_y, max_y = geo.points_boundary(self.points2D)
+        return geo.point_in_boundary(min_x, max_x, min_y, max_y, point)
+    
+    def translate(self, delta):
+        self.points3D = geo.translate_points_3D(self.points3D, delta)
+
+    def rotate(self, delta, center=None):
+        self.points3D = geo.rotate_3D(self.points3D, delta, center)
+
+    def get_center(self):
+        return geo.avg_points3D(self.points3D)
+    
+    def scale(self, s, center=None):
+        s_center = center if center else self.get_center()
+        self.point1 = geo.scale(s, s_center, self.point1)
+        self.point2 = geo.scale(s, s_center, self.point2)
+    
+    def clone(self):
+        circle = Circle(self.clone_pen(), self.transformation, 0)
+        circle.points3D = geo.translate_points_3D(self.points3D, self.copy_delta)
+        return circle
 
 
 class CombinedShape(Shape):
