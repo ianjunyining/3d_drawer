@@ -125,8 +125,7 @@ class Line(Shape):
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
-        self.point1 = geo.scale(s, s_center, self.point1)
-        self.point2 = geo.scale(s, s_center, self.point2)
+        self.points3D = geo.scale_points_3D(s, s_center, self.points3D)
     
     def clone(self):
         return Line(self.clone_pen(), geo.translate(self.point1, self.copy_delta), geo.translate(self.point2, self.copy_delta))
@@ -179,8 +178,7 @@ class Cube(Shape):
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
-        self.point1 = geo.scale(s, s_center, self.point1)
-        self.point2 = geo.scale(s, s_center, self.point2)
+        self.points3D = geo.scale_points_3D(s, s_center, self.points3D)
     
     def clone(self):
         cube = Cube(self.clone_pen(), self.transformation, 0)
@@ -230,8 +228,7 @@ class Pyramid(Shape):
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
-        self.point1 = geo.scale(s, s_center, self.point1)
-        self.point2 = geo.scale(s, s_center, self.point2)
+        self.points3D = geo.scale_points_3D(s, s_center, self.points3D)
     
     def clone(self):
         pyramid = Pyramid(self.clone_pen(), self.transformation, 0)
@@ -260,7 +257,7 @@ class Circle(Shape):
             self.draw_selection_points()
 
     def get_selection_points(self):
-        return  self.points2D
+        return  [self.points2D[0], self.points2D[18], self.points2D[36], self.points2D[54]]
     
     def point_in_shape(self, point):
         min_x, max_x, min_y, max_y = geo.points_boundary(self.points2D)
@@ -277,8 +274,7 @@ class Circle(Shape):
     
     def scale(self, s, center=None):
         s_center = center if center else self.get_center()
-        self.point1 = geo.scale(s, s_center, self.point1)
-        self.point2 = geo.scale(s, s_center, self.point2)
+        self.points3D = geo.scale_points_3D(s, s_center, self.points3D)
     
     def clone(self):
         circle = Circle(self.clone_pen(), self.transformation, 0)
@@ -329,6 +325,11 @@ class CombinedShape(Shape):
             if shape.point_in_shape(point):
                 return True
         return False
+    
+    def scale(self, s, center=None):
+        s_center = center if center else self.get_center()
+        for shape in self.shapes:
+            shape.scale(s, s_center)
     
     def clone(self):
         shapes = []

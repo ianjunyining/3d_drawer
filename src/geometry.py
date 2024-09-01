@@ -100,3 +100,14 @@ def rotate_3D(points, delta, center):
     X1b_arr = np.dot(transformation.T, X0b_arr)
     X1b = [X1b_arr[:, i] for i in range(len(points))]
     return translate_points_3D(X1b, center)
+
+def scale_point_3D(s, center, point):
+    u, v, w = center[0:3]
+    x, y, z = point[0:3]
+    x1 = s * (x - u) + u
+    y1 = s * (y - v) + v
+    z1 = s * (z - w) + w
+    return (x1, y1, z1, 1)
+
+def scale_points_3D(s, center, points):
+    return [scale_point_3D(s, center, point) for point in points]

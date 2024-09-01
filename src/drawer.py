@@ -247,7 +247,7 @@ class Drawer():
 
     def onkeydelete(self):
         self.canvas.delete_selected()
-        
+    
     def onkey_translate(self, key_pressed, magnitude=1):
         delta = magnitude * 10
         key_translation = {
@@ -283,6 +283,16 @@ class Drawer():
                 self.canvas.draw()
             elif self.action == Action.SELECT:
                 self.canvas.rotate_selected(key_rotate[key_pressed])
+
+    def onkey_scale(self, key_pressed, magnitude=1):
+        key_scale = {
+            "r" : 1 + magnitude * 0.01,
+            "f" : 1 - magnitude * 0.01,
+        }
+        for key in key_scale.keys():
+            if key == key_pressed:
+                self.canvas.scale_selected(key_scale[key])
+
 
     def onkey_a(self):
         self.onkey_rotate("a")
@@ -356,4 +366,17 @@ class Drawer():
 
     def onkey_K(self):
         self.onkey_translate("k", 10)
+
+    def onkey_f(self):
+        self.onkey_scale("f", 1)
+
+    def onkey_r(self):
+        self.onkey_scale("r", 1)
+
+    def onkey_F(self):
+        self.onkey_scale("f", 10)
+
+    def onkey_R(self):
+        self.onkey_scale("r", 10)
+
 

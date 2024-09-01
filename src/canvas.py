@@ -72,7 +72,7 @@ class Canvas():
         all_centers = [shape.get_center() for shape in self.shapes if shape.get_selected()]
         if len(all_centers) == 0:
             return
-        center = geo.avg_points(all_centers)
+        center = geo.avg_points3D(all_centers)
         for shape in self.shapes:
             if shape.get_selected():
                 shape.scale(s, center)
