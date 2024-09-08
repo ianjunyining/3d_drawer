@@ -12,6 +12,7 @@ class Action(enum.Enum):
     CIRCLE = 6
     SPHERE = 7
     WALLS = 8
+    SOLAR = 9
 
 
 class Color(enum.Enum):
@@ -78,6 +79,7 @@ class Drawer():
             Action.CIRCLE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 5, btn_st_y), self.btn_sz, "Circle"),
             Action.SPHERE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 6, btn_st_y), self.btn_sz, "Sphere"),
             Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 7, btn_st_y), self.btn_sz, "Walls"),
+            Action.SOLAR: Button(turtle.Turtle(), (btn_st_x + btn_gap * 8, btn_st_y), self.btn_sz, "Solar"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -250,6 +252,8 @@ class Drawer():
         if self.click_on_action_button(x, y):
             if self.action == Action.WALLS:
                 self.canvas.create_customized_arts("walls")
+            elif self.action == Action.SOLAR:
+                self.canvas.create_customized_arts("solar")
         elif self.click_on_color_button(x, y):
             # don't draw
             pass

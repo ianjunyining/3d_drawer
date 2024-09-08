@@ -2,6 +2,7 @@ import turtle
 from src.shape import *
 import src.transformation as trans
 from arts.walls import *
+from arts.solar import *
 
 class Canvas():
     def __init__(self) -> None:
@@ -108,7 +109,7 @@ class Canvas():
 
         arts_map = {
             "walls": Walls,
-            "cube": Cube,
+            "solar": Solar,
         }
 
         if name in arts_map:
