@@ -10,7 +10,8 @@ class Action(enum.Enum):
     CUBE = 4
     PYRAMID = 5
     CIRCLE = 6
-    WALLS = 7
+    SPHERE = 7
+    WALLS = 8
 
 
 class Color(enum.Enum):
@@ -75,7 +76,8 @@ class Drawer():
             Action.CUBE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 3, btn_st_y), self.btn_sz, "Cube"),
             Action.PYRAMID: Button(turtle.Turtle(), (btn_st_x + btn_gap * 4, btn_st_y), self.btn_sz, "Pyramid"),
             Action.CIRCLE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 5, btn_st_y), self.btn_sz, "Circle"),
-            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 6, btn_st_y), self.btn_sz, "Walls"),
+            Action.SPHERE: Button(turtle.Turtle(), (btn_st_x + btn_gap * 6, btn_st_y), self.btn_sz, "Sphere"),
+            Action.WALLS: Button(turtle.Turtle(), (btn_st_x + btn_gap * 7, btn_st_y), self.btn_sz, "Walls"),
         }
         self.action_buttons[Action.SELECT].selected = True
         for _, btn in self.action_buttons.items():
@@ -167,7 +169,7 @@ class Drawer():
                 pen, 
                 self.canvas.transformation, 
                 s, 
-                geo.avg_points3D(self.temp_points_3D),
+                self.temp_points_3D[0],
             )
             self.temp_cube.draw()
             self.canvas.shapes.append(self.temp_cube)
@@ -215,10 +217,34 @@ class Drawer():
                 pen, 
                 self.canvas.transformation, 
                 r, 
-                geo.avg_points3D(self.temp_points_3D),
+                self.temp_points_3D[0],
             )
             self.temp_circle.draw()
             self.canvas.shapes.append(self.temp_circle)
+
+    def make_sphere(self, x, y):
+        if self.action != Action.SPHERE:
+            return
+        if self.state == State.END:
+            self.state = State.START
+            self.temp_points_3D = self.canvas.transformation.project_2d_to_3d([(x, y)])
+        elif self.state == State.START:
+            self.state = State.END 
+            self.temp_points_3D.extend(self.canvas.transformation.project_2d_to_3d([(x, y)]))
+            r = geo.distance_3d(
+                self.temp_points_3D[0], 
+                self.temp_points_3D[1],
+            )
+            pen = turtle.Turtle()
+            pen.color(self.get_color_str(self.color))
+            self.temp_sphere = Sphere(
+                pen, 
+                self.canvas.transformation, 
+                r, 
+                self.temp_points_3D[0],
+            )
+            self.temp_sphere.draw()
+            self.canvas.shapes.append(self.temp_sphere)
 
     def onclick(self, x, y):
         if self.click_on_action_button(x, y):
@@ -237,6 +263,8 @@ class Drawer():
             self.make_pyramid(x, y)
         elif self.action == Action.CIRCLE:
             self.make_circle(x, y)
+        elif self.action == Action.SPHERE:
+            self.make_sphere(x, y)
         
 
     def onkeygroup(self):
